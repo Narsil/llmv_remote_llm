@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  ctfd_remote_llm:
+    build: .
+    user: root
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - .data/ctfd_remote_llm/logs:/var/log/ctfd_remote_llm
+      - .data/ctfd_remote_llm/uploads:/var/uploads
+      - .:/opt/ctfd_remote_llm:ro
+    env_file:
+      - .env
