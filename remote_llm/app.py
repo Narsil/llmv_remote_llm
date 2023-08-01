@@ -26,7 +26,6 @@ models = {
 }
 
 
-
 @app.get("/")
 async def generate(request: GenerateRequest) -> GenerateResponse:
     if request.model not in models:
