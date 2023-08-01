@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 from logging import getLogger
 log = getLogger(__name__)
 
@@ -12,7 +13,7 @@ app = FastAPI()
 class GenerateRequest(BaseModel):
     prompt: str
     preprompt: Optional[str] = None
-    model: Optional[str] = None
+    model: str
 
 
 class GenerateResponse(BaseModel):
@@ -28,11 +29,8 @@ models = {
 
 @app.get("/")
 async def generate(request: GenerateRequest) -> GenerateResponse:
-    if request.model is None:
-        return GenerateResponse(generation="", error="No model specified")
-    
     if request.model not in models:
-        return GenerateResponse(generation="", error="Model not found")
+        return HTTP_404_NOT_FOUND("Model not found")
     
     try:
         generation = await models[request.model](request.prompt, request.preprompt)
