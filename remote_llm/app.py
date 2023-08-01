@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 from fastapi import FastAPI
 from pydantic import BaseModel
 from starlette.status import HTTP_404_NOT_FOUND, HTTP_422_UNPROCESSABLE_ENTITY
 from logging import getLogger
-log = getLogger(__name__)
+log = getLogger("generator")
 
 from remote_llm.huggingface import generate_huggingface
 
@@ -26,7 +26,7 @@ models = {
 }
 
 
-@app.get("/")
+@app.get("/generate")
 async def generate(request: GenerateRequest) -> GenerateResponse:
     if request.model not in models:
         return HTTP_404_NOT_FOUND("Model not found")
@@ -40,7 +40,7 @@ async def generate(request: GenerateRequest) -> GenerateResponse:
     
 
 @app.get("/models")
-async def get_models() -> list:
+async def get_models() -> List[str]:
     return list(models.keys())
 
 

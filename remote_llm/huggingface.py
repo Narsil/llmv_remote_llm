@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 import aiohttp
 from logging import getLogger
-log = getLogger(__name__)
+log = getLogger("generator")
 
 async def generate_huggingface(prompt: str, preprompt: Optional[str] = None) -> str:
     huggingface_key = os.environ.get("HUGGINGFACE_API_KEY")
