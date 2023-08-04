@@ -4,15 +4,11 @@ from fastapi import HTTPException
 from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 import aiohttp
 from logging import getLogger
+from remote_llm.constants import HF_KEY, HF_URL
 log = getLogger("generator")
 
 async def generate_huggingface(prompt: str, preprompt: Optional[str] = None) -> str:
-    huggingface_key = os.environ.get("HUGGINGFACE_API_KEY")
-    if huggingface_key is None:
-        raise ValueError("HUGGINGFACE_API_KEY not set")
-    url = os.environ.get("HUGGINGFACE_API_URL")
-    if url is None:
-        raise ValueError("HUGGINGFACE_API_KEY not set")
+    url = f"{HF_URL}/h4-red-team/f-1"
     
     parameters = {
         "max_new_tokens": 1024,
@@ -23,12 +19,14 @@ async def generate_huggingface(prompt: str, preprompt: Optional[str] = None) -> 
         "stop": ["<|endoftext|>"]
     }
     full_prompt = f"<|system|>{preprompt}<|prompter|>{prompt}<|endoftext|><|assistant|>"
+    headers = {'Authorization': f'Bearer {HF_KEY}'}
 
     
     async with aiohttp.ClientSession() as session:
-        async with session.post(url=url,
-                        headers={'Authorization': f'Bearer {huggingface_key}'},
-                        json={'inputs': full_prompt, "parameters" : parameters, "stream:": False}) as raw_response:
+        async with session.post(
+                url=url,
+                headers=headers,
+                json={'inputs': full_prompt, "parameters" : parameters, "stream:": False}) as raw_response:
             json_response = await raw_response.json()
             if 'error' in json_response:
                 log.error(f"Error generating: {json_response['error']}")

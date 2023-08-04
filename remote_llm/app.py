@@ -11,7 +11,6 @@ from remote_llm.openai import generate_openai
 
 app = FastAPI()
 
-
 class GenerateRequest(BaseModel):
     prompt: str
     preprompt: Optional[str] = None
@@ -30,7 +29,7 @@ models = {
 }
 
 
-@app.get("/generate")
+@app.post("/generate")
 async def generate(request: GenerateRequest) -> GenerateResponse:
     if request.model not in models:
         return HTTP_404_NOT_FOUND("Model not found")
