@@ -6,6 +6,8 @@ from logging import getLogger
 log = getLogger("generator")
 
 from remote_llm.huggingface import generate_huggingface
+from remote_llm.stability import generate_stability
+from remote_llm.openai import generate_openai
 
 app = FastAPI()
 
@@ -22,7 +24,9 @@ class GenerateResponse(BaseModel):
 
 
 models = {
-    "huggingface": generate_huggingface
+    "huggingface": generate_huggingface,
+    "stability": generate_stability,
+    "openai": generate_openai,
 }
 
 

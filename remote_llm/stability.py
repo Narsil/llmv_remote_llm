@@ -6,29 +6,25 @@ import aiohttp
 from logging import getLogger
 log = getLogger("generator")
 
-async def generate_huggingface(prompt: str, preprompt: Optional[str] = None) -> str:
-    huggingface_key = os.environ.get("HUGGINGFACE_API_KEY")
-    if huggingface_key is None:
+async def generate_stability(prompt: str, preprompt: Optional[str] = None) -> str:
+    stability_key = os.environ.get("HUGGINGFACE_API_KEY")
+    if stability_key is None:
         raise ValueError("HUGGINGFACE_API_KEY not set")
-    url = os.environ.get("HUGGINGFACE_API_URL")
+    url = os.environ.get("STABILITY_API_URL")
     if url is None:
-        raise ValueError("HUGGINGFACE_API_KEY not set")
+        raise ValueError("STABILITY_API_URL not set")
     
     parameters = {
-        "max_new_tokens": 1024,
-        "repetition_penalty": 1.2,
-        "return_full_text": False,
-        "top_p": 0.95,
-        "temperature": 0.9,
-        "stop": ["<|endoftext|>"]
+        "max_new_tokens": 512,
+        "temperature": 0.5,
+        "top_p": 0.95
     }
-    full_prompt = f"<|system|>{preprompt}<|prompter|>{prompt}<|endoftext|><|assistant|>"
-
+    full_prompt = prompt
     
     async with aiohttp.ClientSession() as session:
         async with session.post(url=url,
-                        headers={'Authorization': f'Bearer {huggingface_key}'},
-                        json={'inputs': full_prompt, "parameters" : parameters, "stream:": False}) as raw_response:
+                        headers={'Authorization': f'Bearer {stability_key}'},
+                        json={'inputs': full_prompt, "parameters" : parameters}) as raw_response:
             json_response = await raw_response.json()
             if 'error' in json_response:
                 log.error(f"Error generating: {json_response['error']}")
